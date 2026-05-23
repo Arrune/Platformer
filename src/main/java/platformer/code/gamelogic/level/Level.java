@@ -1,3 +1,5 @@
+//Name: Arrune Nimalan
+//Date: 5/20/2026
 package platformer.code.gamelogic.level;
 
 import java.awt.Graphics;
@@ -196,11 +198,63 @@ public class Level {
 	//#############################################################################################################
 	//Your code goes here! 
 	//Please make sure you read the rubric/directions carefully and implement the solution recursively!
+	//Precondition: Column and row are in bounds, map exists, and fullness is equal to 0, 1, 2, or 3
+	//Postcondition: Changes the image of the water object (either falling, quarter, half, or full)
 	private void water(int col, int row, Map map, int fullness) {
-		Water water = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, fullness);
-		map.addTile(col, row, water);
-		if (col+1 < map.getTiles().length && map.getTiles()[col+1][row].isSolid()){
-			water(col+1, row, map, fullness);
+		Water w;
+		if (fullness == 0){
+			w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, 0);
+		}
+		else if (fullness == 1){
+			w = new Water(col, row, tileSize, tileset.getImage("Quarter_water"), this, 1);
+		}
+		else if (fullness == 2){
+			w = new Water(col, row, tileSize, tileset.getImage("Half_water"), this, 2);
+		}
+		else {
+			w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
+		}
+		map.addTile(col, row, w);
+
+        //check if we can go down
+        //if we can’t go down go left and right.
+		if (row+1 < map.getTiles()[col].length && !(map.getTiles()[col][row+1].isSolid()) && !(map.getTiles()[col][row+1] instanceof Water)){
+			water(col, row+1, map, 0);
+		}
+		else if (row+1 < map.getTiles()[col].length && map.getTiles()[col][row+1].isSolid() && fullness == 0){
+			water(col, row, map, 3);	
+		}
+		else{
+			//right
+			if(col+1 < map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !(map.getTiles()[col+1][row].isSolid())) {
+				if (fullness == 1){
+					water(col+1, row, map, 1);
+				}
+				else if (fullness == 2){
+					water(col+1, row, map, 1);
+				}
+				else if (fullness == 0){
+					water(col+1, row, map, 3);
+				}
+				else{
+					water(col+1, row, map, 2);
+				}	
+			}
+			//left
+			if(col-1 >= 0 && !(map.getTiles()[col-1][row] instanceof Water) && !(map.getTiles()[col-1][row].isSolid())) {
+				if (fullness == 1){
+					water(col-1, row, map, 1);
+				}
+				else if (fullness == 2){
+					water(col-1, row, map, 1);
+				}
+				else if (fullness == 0){
+					water(col-1, row, map, 3);
+				}
+				else{
+					water(col-1, row, map, 2);
+				}
+			}
 		}
 	}
 
